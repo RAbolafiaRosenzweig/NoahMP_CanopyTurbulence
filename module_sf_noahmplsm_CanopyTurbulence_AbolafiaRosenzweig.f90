@@ -429,7 +429,7 @@ contains
 		   GHB     , IRG     , IRC     , IRB     , TR      , EVC     , & ! OUT :
 		   CHLEAF  , CHUC    , CHV2    , CHB2    , FPICE   , PAHV    , &
                    PAHG    , PAHB    , PAH     , LAISUN  , LAISHA  , &
-                   RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp)      ! Outputs added by Ronnie))
+                   RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp, RAHGground, rahgCUM, BETAMOL, psim,CWPC)      ! Outputs added by Ronnie))
 
 ! --------------------------------------------------------------------------------------------------
 ! Initial code: Guo-Yue Niu, Oct. 2007
@@ -693,14 +693,18 @@ REAL, INTENT(OUT) ::  RAMC         !aerodynamic resistance for momentum (s/m)
 REAL, INTENT(OUT) ::  RAHC         !aerodynamic resistance for sensible heat (s/m)
 REAL, INTENT(OUT) ::  RAWC         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  RAHG         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  RAHGground         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  rahgCUM         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  BETAMOL
 REAL, INTENT(OUT) ::  RAWG         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  MOL          !Monin-Obukhov length (m)
 REAL, INTENT(OUT) ::  UC           !wind speed at top of canopy (m/s)
 REAL, INTENT(OUT) ::  KH           !turbulent transfer coefficient, sensible heat, (m2/s)
 REAL, INTENT(OUT) ::  FV           !friction velocity (m/s)
 REAL, INTENT(OUT) :: zdisp    !zero plane displacement (m)
-
-  ! INTENT (OUT) variables need to be assigned a value.  These normally get assigned values
+REAL, INTENT(OUT) :: psim    ! psi function for momentum
+REAL, INTENT(OUT) :: CWPC
+! INTENT (OUT) variables need to be assigned a value.  These normally get assigned values
   ! only if DVEG == 2.
   nee = 0.0
   npp = 0.0
@@ -811,7 +815,8 @@ REAL, INTENT(OUT) :: zdisp    !zero plane displacement (m)
                          Q1     ,Q2V    ,Q2B    ,Q2E    ,CHV  ,CHB, EMISSI,PAH  ,&
                  SHG,SHC,SHB,EVG,EVB,GHV,GHB,IRG,IRC,IRB,TR,EVC,CHLEAF,CHUC,CHV2,CHB2, &
                          JULIAN, SWDOWN, PRCP, FB, GECROS1D, &
-                         RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp)      ! Outputs added by Ronnie)
+                         RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp,RAHGground,rahgCUM,BETAMOL,psim, CWPC)      ! Outputs added by Ronnie)
+
 !jref:end
 
     SICE(:) = MAX(0.0, SMC(:) - SH2O(:))   
@@ -1593,7 +1598,8 @@ END DO
                      Q1     ,Q2V    ,Q2B    ,Q2E    ,CHV  ,CHB, EMISSI,PAH  ,&
 		     SHG,SHC,SHB,EVG,EVB,GHV,GHB,IRG,IRC,IRB,TR,EVC,CHLEAF,CHUC,CHV2,CHB2, &
                      JULIAN, SWDOWN, PRCP, FB, GECROS1D, &
-                     RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp)      ! Outputs added by Ronnie)
+                     RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp,RAHGground,rahgCUM,BETAMOL,psim, CWPC)      ! Outputs added by Ronnie)
+
 !jref:end                            
 
 ! --------------------------------------------------------------------------------------------------
@@ -1855,12 +1861,17 @@ REAL, INTENT(OUT) ::  RAMC         !aerodynamic resistance for momentum (s/m)
 REAL, INTENT(OUT) ::  RAHC         !aerodynamic resistance for sensible heat (s/m)
 REAL, INTENT(OUT) ::  RAWC         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  RAHG         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  RAHGground         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  rahgCUM         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  BETAMOL
 REAL, INTENT(OUT) ::  RAWG         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  MOL          !Monin-Obukhov length (m)
 REAL, INTENT(OUT) ::  UC           !wind speed at top of canopy (m/s)
 REAL, INTENT(OUT) ::  KH           !turbulent transfer coefficient, sensible heat, (m2/s)
 REAL, INTENT(OUT) ::  FV           !friction velocity (m/s)
 REAL, INTENT(OUT) :: zdisp    !zero plane displacement (m)
+REAL, INTENT(OUT) :: psim    ! psi function for momentum
+REAL, INTENT(OUT) :: CWPC
 REAL                                              :: ZPD    !zero plane displacement (m)
 
 ! ---------------------------------------------------------------------------------------------------
@@ -2092,7 +2103,8 @@ REAL                                              :: ZPD    !zero plane displace
                     QC      ,QSFC    ,PSFC    , & !in
                     Q2V     ,CHV2, CHLEAF, CHUC, &
                     SH2O,JULIAN, SWDOWN, PRCP, FB, FSR, GECROS1D, & !Gecros
-                    RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp)      ! Outputs added by Ronnie
+                    RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp,RAHGground,rahgCUM,BETAMOL,psim,CWPC)      ! Outputs added by Ronnie
+
 !jref:end                            
     END IF
 
@@ -3430,8 +3442,7 @@ REAL                                              :: ZPD    !zero plane displace
                        QC      ,QSFC    ,PSFC    ,                   & !in
                        Q2V     ,CAH2    ,CHLEAF  ,CHUC,              & !inout 
                        SH2O,JULIAN, SWDOWN, PRCP, FB, FSR, GECROS1D, & !Gecros
-                       RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp)      ! Outputs added by Ronnie
-
+                       RB, RAMC, RAHC, RAWC, RAHG, RAWG, MOL, UC, KH, FV, zdisp,RAHGground,rahgCUM,BETAMOL,psim,CWPC)      ! Outputs added by Ronnie
 
 ! --------------------------------------------------------------------------------------------------
 ! use newton-raphson iteration to solve for vegetation (tv) and
@@ -3649,7 +3660,6 @@ REAL,   DIMENSION(276,41)  :: psigridH     ! Grid of psihat values for heat
 INTEGER :: MITER      !iteration index for MOST loop
 REAL :: MOLdif
 REAL :: dtMOL
-REAL :: BETAMOL
 REAL :: Sc
 REAL :: MOZ2
 
@@ -3659,6 +3669,9 @@ REAL, INTENT(OUT) ::  RAMC         !aerodynamic resistance for momentum (s/m)
 REAL, INTENT(OUT) ::  RAHC         !aerodynamic resistance for sensible heat (s/m)
 REAL, INTENT(OUT) ::  RAWC         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  RAHG         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  RAHGground         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  rahgCUM         !aerodynamic resistance for sensible heat (s/m)
+REAL, INTENT(OUT) ::  BETAMOL
 REAL, INTENT(OUT) ::  RAWG         !aerodynamic resistance for water vapor (s/m)
 REAL, INTENT(OUT) ::  MOL          !Monin-Obukhov length (m)
 REAL, INTENT(OUT) ::  UC           !wind speed at top of canopy (m/s)
@@ -3666,6 +3679,8 @@ REAL, INTENT(OUT) ::  KH           !turbulent transfer coefficient, sensible hea
 REAL, INTENT(OUT) ::  FV           !friction velocity (m/s)
 REAL, INTENT(IN) :: ZPD    !zero plane displacement (m)
 REAL, INTENT(OUT) :: zdisp    !zero plane displacement (m)
+REAL, INTENT(OUT) :: psim    ! psi function for momentum
+REAL, INTENT(OUT) :: CWPC
 REAL                             :: RAMG   !aerodynamic resistance for momentum (s/m)
 
   TDC(T)   = MIN( 50., MAX(-50.,(T-TFRZ)) )
@@ -3719,8 +3734,8 @@ psigridH=parameters%psigridH
 ! canopy height
 
         HCAN = parameters%HVT
-        UC = UR*LOG(HCAN/Z0M)/LOG(ZLVL/Z0M)
-        UC = UR*LOG((HCAN-ZPD+Z0M)/Z0M)/LOG(ZLVL/Z0M)   ! MB: add ZPD v3.7
+        !UC = UR*LOG(HCAN/Z0M)/LOG(ZLVL/Z0M)
+        !UC = UR*LOG((HCAN-ZPD+Z0M)/Z0M)/LOG(ZLVL/Z0M)   ! MB: add ZPD v3.7
         IF((HCAN-ZPD) <= 0.) THEN
           WRITE(message,*) "CRITICAL PROBLEM: HCAN <= ZPD"
           call wrf_message ( message )
@@ -3782,6 +3797,7 @@ IF (OPT_SFC ==1 .OR. OPT_SFC==2) THEN
        RAMC = MAX(1.,1./(CM*UR))
        RAHC = MAX(1.,1./(CH*UR))
        RAWC = RAHC
+       UC = FV/VKC * LOG( (HCAN - ZPD)/Z0M) !added by Ronnie
 ENDIF
 
 
@@ -3799,7 +3815,7 @@ loop2: DO MITER = 1, NITERC    !  begin stability iteration
         MPE,ZLVL, QSFC, QAIR, SFCTMP, UR, &              !in
         dtLgridM, zdtgridM, psigridM, dtLgridH, psigridH,zdtgridH, &    !in
         MOL, MOLdif, FHG, MOZG, MOZSGN, &                              !inout
-        FV, UC, zdisp, dtMOL, BETAMOL,Sc,MOZ2)                                !out
+        FV, UC, zdisp, dtMOL, BETAMOL,Sc,MOZ2,psim)                                !out
 
 IF (MLITER == 1) THEN
       exit loop2
@@ -3815,7 +3831,7 @@ END DO loop2 ! end stability iteration
         CWP, FHG, MPE,ZLVL, UR, dtMOL, FV, UC,MOZ, Sc,MOZ2, zdisp, & !in
         dtLgridM, zdtgridM, psigridM, dtLgridH, zdtgridH, psigridH, & !in
         FM,FH,FM2,FH2, & !inout
-        RAHG, RAWG, RB, RAMC, RAHC, RAWC, KH) !out
+        RAHG, RAWG, RB, RAMC, RAHC, RAWC, KH,RAHGground,rahgCUM,BETAMOL) !out
 
 !Calculate CM and CH:
 CM = 1 / (RAMC*UR)
@@ -3825,7 +3841,7 @@ CH = 1 / (RAHC*UR)
         ZPD    ,Z0MG   ,Z0HG   ,HCAN   ,UC     , & !in
         Z0H    ,FV     ,CWP    ,VEGTYP ,MPE    , & !in
         TV     ,MOZG   ,FHG    ,ILOC   ,JLOC   , & !inout
-        RAMG   ,RAHG   ,RAWG   ,RB , KH    )           !out
+        RAMG   ,RAHG   ,RAWG   ,RB , KH  ,CWPC  )           !out
     ENDIF
 
 ! es and d(es)/dt evaluated at tv
@@ -4405,7 +4421,7 @@ IF(OPT_SFC == 1 .or. OPT_SFC==5) THEN
                    ZPD    ,Z0MG   ,Z0HG   ,HCAN   ,UC     , & !in
                    Z0H    ,FV     ,CWP    ,VEGTYP ,MPE    , & !in
                    TV     ,MOZG   ,FHG    ,ILOC   ,JLOC   , & !inout
-                   RAMG   ,RAHG   ,RAWG   ,RB, KH     )           !out
+                   RAMG   ,RAHG   ,RAWG   ,RB, KH  ,CWPC   )           !out
 ! --------------------------------------------------------------------------------------------------
 ! compute under-canopy aerodynamic resistance RAG and leaf boundary layer
 ! resistance RB
@@ -4446,13 +4462,13 @@ REAL,              INTENT(OUT) ::  KH           !turbulent transfer coefficient,
   REAL                             :: RAHG   !aerodynamic resistance for sensible heat (s/m)
   REAL                             :: RAWG   !aerodynamic resistance for water vapor (s/m)
   REAL                             :: RB     !bulk leaf boundary layer resistance (s/m)
-
+  REAL                             :: CWPC
 
   REAL :: TMP1         !temporary calculation
   REAL :: TMP2         !temporary calculation
   REAL :: TMPRAH2      !temporary calculation for aerodynamic resistances
   REAL :: TMPRB        !temporary calculation for rb
-  real :: MOLG,FHGNEW,CWPC
+  real :: MOLG,FHGNEW
 ! --------------------------------------------------------------------------------------------------
 ! stability correction to below canopy resistance
 
@@ -4882,7 +4898,7 @@ REAL,              INTENT(OUT) ::  KH           !turbulent transfer coefficient,
                     MPE,ZLVL, QSFC, QAIR, SFCTMP, UR, &              !in
                     dtLgridM, zdtgridM, psigridM, dtLgridH, psigridH,zdtgridH, &    !in
                     MOL, MOLdif, FHG, MOZG, MOZSGN, &                              !inout
-                    FV, UC, zdisp, dtMOL, BETAMOL,Sc,MOZ2)                                !out
+                    FV, UC, zdisp, dtMOL, BETAMOL,Sc,MOZ2,psim)                                !out
 ! --------------------------------------------------------------------------------------------------
 ! compute under-canopy aerodynamic resistance RAG and leaf boundary layer
 ! resistance RB
@@ -4931,6 +4947,7 @@ REAL,              INTENT(OUT) ::  KH           !turbulent transfer coefficient,
     REAL,                   INTENT(OUT) :: FV                     !friction velocity (m/s)
     REAL,                   INTENT(OUT) :: UC                     !wind speed at top of canopy (m/s)
     REAL,                   INTENT(OUT) :: zdisp                  !Displacement height (m)
+    REAL,                   INTENT(OUT) :: psim                  ! psi function for momentum
     REAL,                   INTENT(OUT) :: dtMOL                 ! Height below canopy top (dtMOL = HCAN - zdisp)
     REAL,                   INTENT(OUT) :: BETAMOL               ! Value of FV/UC
     REAL,                   INTENT(OUT) :: Sc                     !Schmidt number
@@ -4954,7 +4971,6 @@ REAL,              INTENT(OUT) ::  KH           !turbulent transfer coefficient,
     REAL    :: LcL                            ! Canopy density scale (Lc) / Obukhov length (obu)
     REAL    :: LcLval                        ! LcL with limits applied
     REAL    :: zeta                           ! Monin-Obukhov stability parameter (z-d)/L
-    REAL    :: psim                           ! psi function for momentum
     REAL    :: psic                           ! psi function for scalar
     REAL    :: zlog                           ! log((zref-zdisp)/(ztop-zdisp))
     REAL    :: qstar                          ! Water vapor scale (kg/kg)
@@ -5152,7 +5168,7 @@ END SUBROUTINE OBUFUNC
                                 CWP, FHG, MPE,ZLVL, UR, dtMOL, FV, UC,MOZ, Sc,MOZ2, zdisp, & !in
                                 dtLgridM, zdtgridM, psigridM, dtLgridH, zdtgridH, psigridH, & !in
                                 FM,FH,FM2,FH2, & !inout
-                                RAHG, RAWG, RB, RAMC, RAHC, RAWC, KH) !out
+                                RAHG, RAWG, RB, RAMC, RAHC, RAWC, KH,RAHGground,rahgCUM,BETAMOL) !out
 
 
 ! --------------------------------------------------------------------------------------------------
@@ -5199,6 +5215,9 @@ END SUBROUTINE OBUFUNC
 
 ! outputs
     REAL, INTENT(OUT) :: RAHG                 !aerodynamic resistance for sensible heat (s/m) (z<HCAN)
+    REAL, INTENT(OUT) ::  RAHGground         !aerodynamic resistance for sensible heat (s/m)
+    REAL, INTENT(OUT) ::  rahgCUM         !aerodynamic resistance for sensible heat (s/m)
+    REAL, INTENT(OUT) ::  BETAMOL
     REAL, INTENT(OUT) :: RAWG                 !aerodynamic resistance for water vapor (s/m) (z<HCAN)
     REAL, INTENT(OUT) :: RB                   !bulk leaf boundary layer resistance (s/m)
     REAL, INTENT(OUT) :: RAMC                 !aerodynamic resistance for momentum (s/m) - above canopy (z>HCAN)
@@ -5213,7 +5232,6 @@ END SUBROUTINE OBUFUNC
 
 ! locals
     REAL :: Z0HG   !roughness length, sensible heat, ground (m) for RAHG calculation
-    REAL :: BETAMOL                       ! Value of FV/UC
     REAL :: CWPC
     REAL :: lm                             !mixing length
     REAL :: Lc                             ! Canopy density length scale (m)
@@ -5225,7 +5243,6 @@ END SUBROUTINE OBUFUNC
     REAL :: psic2                          ! psi function for scalar
     REAL :: zincr                         ! increment for discretizing layer below canopy in calculation of gah
     REAL :: Z1LVL                          ! defines ground elevation (0m)
-    REAL :: rahgCUM                        ! cumulative scalar aerodynamic resistance for z<HCAN
     REAL :: kk                             ! do loop iteration counter
     REAL :: z_tmp                          ! elevation for current iteration
     REAL :: gah                            ! scalar aerodynamic conductance to canopy height
@@ -5235,7 +5252,6 @@ END SUBROUTINE OBUFUNC
     REAL :: RSL_bottom                     !bottom of RAHC calc (ZPD)
     REAL :: CGH                            !1/RAHG
     REAL :: RAHGveg                        !RAHG profile for z<HCAN (within the canopy)
-    REAL :: RAHGground                     !RAHg directly above ground surface (Bonan et al., 2018 eq. 27)
     REAL :: WindG                          ! Wind speed at ground (m/s)
     REAL :: FVg                            ! friction velocity at ground (m/s)
     REAL :: zlogm                          ! momentum log profile at ground
@@ -5308,7 +5324,6 @@ RB     = MIN(MAX(RB, 5.0),50.0) ! limit RB to 5~50
 !Following Bonan et al. (2018) eq. 26 - the resistance is integrated for (z<HCAN)
 Z0MG = 0.01
 Z0HG = 0.1 * Z0MG
-Z1LVL = 0.1
 Lc = HCAN/ (0.25 * VAI)
 lm = 2*BETAMOL**3*Lc
 eta = min(BETAMOL/lm*HCAN,20)
